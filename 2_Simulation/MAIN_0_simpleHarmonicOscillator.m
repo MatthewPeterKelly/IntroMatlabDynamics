@@ -27,45 +27,34 @@ function MAIN_0_simpleHarmonicOscillator()
 %   z = [x;v]
 %
 
-% Time step for the numerical integration method. Notice that the solution
-% by Euler's method is not very good when the time step is large!
-h = 0.1;   %Time step 
+% Time span for the simulation
+tSpan = [0,1];
 
-% Set up timing stuff
-t0 = 0;
-tF = 10;
-t = t0 : h : tF;  %Time vector
-
+% Initial state (position and velocity)
+x0 = 1.0;
+v0 = 0.0;
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %                         Analytic Solution                               %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 
-% Initial state (position and velocity)
-x0 = 1.0;
-v0 = 0.0;
-
-% Define a function handle for the position solution
-xSoln = @(t)( v0*sin(t) + x0*cos(t) );
-
-% Define a function for the velocity solution.
-function v = vSoln(t)
-    % Note that v0 and x0 are taken from the current workspace
-    v = v0*cos(t) - x0*sin(t);
-end
+% Analytic Solution:
+tSoln = linspace(tSpan(1), tSpan(2), 100);
+xSoln = v0*sin(tSoln) + x0*cos(tSoln);
+vSoln = v0*cos(tSoln) - x0*sin(tSoln);
 
 % Plot the solution:
 figure(1); clf;
 
 subplot(2,1,1);
-plot(t,xSoln(t),'k-');
+plot(tSoln,xSoln,'k-');
 xlabel('time (s)')
 ylabel('position (m)')
 title('Position vs Time')
 
 subplot(2,1,2);
-plot(t,vSoln(t),'k-');
+plot(tSoln,vSoln,'k-');
 xlabel('time (s)')
 ylabel('velocity (m/s)')
 title('Velocity vs Time')
@@ -74,6 +63,9 @@ title('Velocity vs Time')
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %                Numerical Solution    (ode45)                            %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+
+% Vector of times that we would like ode45 to return the state at:
+t = linspace(tSpan(1), tSpan(2), 100);
 
 % Initial State vector
 z0 = [x0;v0];
@@ -86,7 +78,7 @@ v = z(2,:);
 % Plot the numerical solution over top of the analytic solution:
 subplot(2,1,1); hold on
 plot(t,x,'bs');
-legend('analytic','ode5')
+legend('analytic','ode45')
 
 subplot(2,1,2); hold on;
 plot(t,v,'bs');

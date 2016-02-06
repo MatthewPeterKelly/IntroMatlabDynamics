@@ -151,7 +151,7 @@ vRK4 = zRK4(2,:);
 % struct, rather than the interpolant of the solution
 soln = ode45(@simpleHarmonicOscillator,tSpan,z0);
 
-% Solution on the time-stepping grid that ode45 actually used
+% Solution on the time-grid that ode45 actually used
 tOde45Grid = soln.x;   %Time (which ode45 confusingly calls 'x')
 zOde45Grid = soln.y;   %State (which ode45 confusingly calls 'y')
 xOde45Grid = zOde45Grid(1,:);  % Extract position
