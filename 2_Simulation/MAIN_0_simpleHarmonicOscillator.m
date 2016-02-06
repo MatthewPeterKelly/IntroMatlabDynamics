@@ -1,8 +1,8 @@
-function MAIN_0_Euler()
+function MAIN_0_simpleHarmonicOscillator()
 %
-% MAIN  --  Euler
+% MAIN  --  Use ODE45 to simulate a simple harmonic oscillator
 %
-% Basic simulation in Matlab, using vectors, functions, and Euler's method
+% Basic simulation in Matlab using ode45
 %
 % Simple Harmonic Oscillator:
 % 
@@ -29,13 +29,12 @@ function MAIN_0_Euler()
 
 % Time step for the numerical integration method. Notice that the solution
 % by Euler's method is not very good when the time step is large!
-h = 0.05;   %Time step 
+h = 0.1;   %Time step 
 
 % Set up timing stuff
 t0 = 0;
 tF = 10;
 t = t0 : h : tF;  %Time vector
-
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
@@ -47,12 +46,14 @@ t = t0 : h : tF;  %Time vector
 x0 = 1.0;
 v0 = 0.0;
 
-% Define a function handle for the solution:
+% Define a function handle for the position solution
 xSoln = @(t)( v0*sin(t) + x0*cos(t) );
-vSoln = @(t)( v0*cos(t) - x0*sin(t) );
 
-% Make a function for computing the state vector:
-zSoln = @(t)( [xSoln(t); vSoln(t)] );
+% Define a function for the velocity solution.
+function v = vSoln(t)
+    % Note that v0 and x0 are taken from the current workspace
+    v = v0*cos(t) - x0*sin(t);
+end
 
 % Plot the solution:
 figure(1); clf;
@@ -71,27 +72,6 @@ title('Velocity vs Time')
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-%             Numerical Solution      (Euler's Method)                    %
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-
-% Initial State vector
-z0 = [x0;v0];
-
-% Call numerical integration with Euler's method:
-dynFun = @(t,z)( simpleHarmonicOscillator(z) );
-z = eulerMethod(dynFun,t,z0);
-x = z(1,:);
-v = z(2,:);
-
-% Plot the numerical solution over top of the analytic solution:
-subplot(2,1,1); hold on
-plot(t,x,'ro');
-
-subplot(2,1,2); hold on;
-plot(t,v,'ro');
-
-
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %                Numerical Solution    (ode45)                            %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
@@ -99,19 +79,18 @@ plot(t,v,'ro');
 z0 = [x0;v0];
 
 % Call numerical integration with Euler's method:
-dynFun = @(t,z)( simpleHarmonicOscillator(z) );
-[~, z] = ode45(dynFun,t,z0); z = z';
+[~, z] = ode45(@simpleHarmonicOscillator,t,z0); z = z';
 x = z(1,:);
 v = z(2,:);
 
 % Plot the numerical solution over top of the analytic solution:
 subplot(2,1,1); hold on
 plot(t,x,'bs');
-legend('analytic','euler','ode5')
+legend('analytic','ode5')
 
 subplot(2,1,2); hold on;
 plot(t,v,'bs');
-legend('analytic','euler','ode5')
+legend('analytic','ode5')
 
 
 end
@@ -120,7 +99,7 @@ end
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-function dz = simpleHarmonicOscillator(z)
+function dz = simpleHarmonicOscillator(t,z)
 %
 % Computes the dynamics of the simple harmonic oscillator
 %
@@ -145,53 +124,6 @@ dv = -x;
 dz = [dx;dv];
 
 end
-
-
-
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-
-function z = eulerMethod(dynFun,t,z0)
-%
-% Simulates a system using Euler's method
-%
-% INPUTS:
-%   dynFun = function handle
-%       dz = dynFun(t,z)
-%           t = [1,1] = time
-%           z = [nz,1] = state vector
-%           dz = [nz,1] = dz/dt = derivative of state vector
-%   t = [1,nt] = time vector
-%   z0 = [nz,1] = initial state
-% 
-% OUTPUTS:
-%   z = [nz, nt] = state at each grid point
-%
-
-% Figure out problem size
-nt = length(t);
-nz = size(z0,1);
-
-% Allocate memory for the output:
-z = zeros(nz,nt);
-
-% Store the initial state:
-z(:,1) = z0;
-
-% March forward in time:
-for i=2:nt
-    dt = t(i)-t(i-1);  %Current time step
-    tNow = t(i-1);   %Current time
-    zNow = z(:,i-1);  %Current state
-   
-    dzNow = dynFun(tNow,zNow);  %Derivative at this point:
-   
-    z(:,i) = zNow + dt*dzNow; 
-end
-
-end
-
-
 
 
 
