@@ -18,12 +18,47 @@ t = linspace(0,2,80); % times to look at solution [sec] (0 is initial
 p.m = 1; % set point mass to be 1 [kg]
 p.g = 9.81; % set acceleration due to gravity [m/s^2]
 
+% Create a nested function for the dynamics. This allows us to pass the
+% parameter struct (p) as a special type of global variable, which avoids
+% the confusing (and undocumented) syntax for ode45 where you tack on
+% parameters to the end of the argument list in ode45.
+    function dz = massInGravityField(~,z)
+        %
+        % Computes the dynamics a particle in a constant gravitational field
+        %
+        % INPUTS:
+        %   t = current time
+        %   z = [x;y;dx;dy] = state vector
+        %   p = structure containing parameters
+        %
+        % OUTPUTS:
+        %   dz = [dx;dy;ddx;ddy] = time-derivative of the state vector
+        %
+        
+        % unpack parameters
+        m = p.m; % particle mass [kg]
+        g = p.g; % acceleration due to gravity [m/s^2]
+        
+        x=z(1); y= z(2); dx = z(3);  dy = z(4);  % unpack z into readable names
+        
+        % x and y components of force on particle
+        Fx = 0; % no horizontal force component
+        Fy = -m*g; % vertical force component from gravity
+        
+        % compute x and y components of acceleration using Newton's 2nd (a=F/m)
+        ddx = Fx/m; % x acceleration component
+        ddy = Fy/m; % y acceleration component
+        
+        % The rates of change of all variables in z
+        dz = [dx,dy,ddx,ddy]';
+    end
+
 % ODESET sets preferences for ODE solvers like ODE45
 % here we tell ode45 how much error we tolerate in the solution
 options = odeset('abstol', 1e-6,'reltol',1e-6);
 
 % The next line numerically solves the ODEs that are in massInGravityField
-[~,z] = ode45(@massInGravityField,t, z0,options,p);
+[~,z] = ode45(@massInGravityField,t, z0,options);
 
 % Pull out x and y comps of position at different times
 x = z(:,1);
@@ -42,10 +77,10 @@ title('Trajectory of Point Mass','fontsize',16)
 for i=1: length(t);
     if i==1
         % Create a marker for the projectile and plot it on the figure
-        circleHandle = plot(x(), y(i),...   
+        circleHandle = plot(x(), y(i),...
             'ro','markersize',14,'linewidth',6);
     else
-        % Now that marker is created, just move it on each new frame 
+        % Now that marker is created, just move it on each new frame
         set(circleHandle,'xData',x(i),'yData',y(i));
     end
     pause(.05);    %Pause between frames to make animation visible
@@ -68,38 +103,4 @@ ylabel('y-position (m)')
 title('height vs time')
 
 
-end
-
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-
-function dz = massInGravityField(t,z,p)
-%
-% Computes the dynamics a particle in a constant gravitational field
-%
-% INPUTS:
-%   t = current time
-%   z = [x;y;dx;dy] = state vector
-%   p = structure containing parameters
-%
-% OUTPUTS:
-%   dz = [dx;dy;ddx;ddy] = time-derivative of the state vector
-%
-
-% unpack parameters
-m = p.m; % particle mass [kg]
-g = p.g; % acceleration due to gravity [m/s^2]
-
-x=z(1); y= z(2); dx = z(3);  dy = z(4);  % unpack z into readable names
-
-% x and y components of force on particle
-Fx = 0; % no horizontal force component
-Fy = -m*g; % vertical force component from gravity
-
-% compute x and y components of acceleration using Newton's 2nd (a=F/m)
-ddx = Fx/m; % x acceleration component
-ddy = Fy/m; % y acceleration component
-
-% The rates of change of all variables in z
-dz = [dx,dy,ddx,ddy]';
 end
