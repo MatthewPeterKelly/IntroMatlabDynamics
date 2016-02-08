@@ -58,11 +58,12 @@ disp(['Number of inputs: ' num2str(nargin)]);
 timeMs = getTimeMs();
 disp(['Time since Matlab started: ' num2str(timeMs) ' ms']);
 
-% We can also define a function inside of another function:
-a = 2.3;
-b = 5.4;
-C = 6.5;
-D = 0.5;
+% We can also define a function inside of another function. This is called
+% a "Nested Function". 
+a = 2.3;   %  <-- This variable is passed as an argument 
+b = 5.4;   %  <-- This variable is passed as an argument 
+C = 6.5;   %  <-- This variable is passed into the function implicitly
+D = 0.5;   %  <-- This variable is passed into the function implicitly
     function val = addVals(a,b)
         % Notice that there are two ways to pass variables to this type of
         % function. a and b are passed as arguments to the function. Since
@@ -73,7 +74,8 @@ D = 0.5;
 
 % There are even more kinds of functions. An anonymous function is one that
 % does not have a name. It is defined using the @ symbol. The resulting
-% variable is called a function handle.
+% variable is called a function handle. Sometimes this is also called a 
+% lambda function.
 myFunHandle = @(t)( t.^2 );
 
 % We can call a function handle just like a regular function
