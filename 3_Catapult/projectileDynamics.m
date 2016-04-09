@@ -1,11 +1,16 @@
 function dz = projectileDynamics(z,param)
 % dz = projectileDynamics(z,param)
 %
-% This function computes the dynamics of a simple torqsion catapult, in
-% first-order form.
+% This function computes the dynamics of a the projectile after it has left
+% the catapult and is flying through the air
 %
 % INPUTS:
-%   z = [q; dq] = state
+%   z = [x; y; dx; dy] = state
+%       x = projectile horizontal position
+%       y = projectile vertical position
+%       dx = projectile horizontal velocity
+%       dy = projectile vertical velocity
+%
 %   param = struct of parameters
 %       .armMass
 %       .projectileMass
@@ -13,40 +18,39 @@ function dz = projectileDynamics(z,param)
 %       .gravity
 %       .springConstant
 %       .springRestAngle
+%       .quadraticAirDrag
 %
 % OUTPUTS:
 %   dz = [dz/dt] = [dq;ddq] = derivative of state
 %
 % NOTES:
-%   - catapult is powered by a simple torsion spring
-%   - carapult arm is a slendar rod
-%   - projecile is a point mass
+%   - projectile is a point mass
+%   - constant gravity force
+%   - quadratic air drag
 %  
 
 % Unpack the state
-q = z(1,:);
-dq = z(2,:);
+x = z(1,:);
+y = z(2,:);
+dx = z(3,:);
+dy = z(4,:);
 
-% Compute the rotational inertia of the arm:
-r = param.armLength;
-m1 = param.projectileMass;
-m2 = param.armMass;
-I_projectile = m1*r*r;
-I_arm = (1/3)*m2*r*r;
-Inertia = I_arm + I_projectile;
+% Drag forces
+speed = sqrt(dx.*dx + dy.*dy);
+Cd = param.quadraticAirDrag;
+Fx_drag = -Cd*speed*dx;
+Fy_drag = -Cd*speed*dy;
 
-% Compute the net torque acting on the arm:
+% Gravity force:
+m = param.projectileMass;
 g = param.gravity;
-k = param.springConstant;
-q0 = param.springRestAngle;
-T_gravity = -g*(m1*r + 0.5*m2*r)*sin(q);
-T_spring = -k*(q-q0);
-Torque = T_gravity + T_spring;
+Fy_gravity = -m*g;
 
-% Angular acceleration, compute by torque balance
-ddq = Torque./Inertia;
+% Dynamics  F=ma  -->   a = F/m
+ddx = Fx_drag/m;
+ddy = (Fy_drag+Fy_gravity)/m;
 
-% Combine into a single vector for output:
-dz = [dq;ddq];
+% Pack up derivatives:
+dz = [dx;dy;ddx;ddy];
 
 end
