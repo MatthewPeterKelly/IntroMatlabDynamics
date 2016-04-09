@@ -6,11 +6,11 @@
 %
 
 %%%% parameters for the model and simulation:
-param.armMass = 8;   %(kg)  arm is a slendar rod
-param.projectileMass = 1;  %(kg)
-param.armLength = 1.5;  %(m) 
+param.armMass = 10;   %(kg)  arm is a slendar rod
+param.projectileMass = 2;  %(kg)
+param.armLength = 2.5;  %(m) 
 param.gravity = 9.81;  %(m/s^2)
-param.springConstant = 1000;  %(N/rad)
+param.springConstant = 3000;  %(N/rad)
 param.springRestAngle = 0*(pi/180);  % (rad)  measured from pos. vert. axis.
 param.initialAngle = (90+30)*(pi/180);  % (rad)  measured from pos. vert. axis.
 param.quadraticAirDrag = 0.1;  %(N-s^2/m^2)
@@ -22,7 +22,7 @@ param.yCatapult = 2;  %(m)  height of the catapult axle above ground
 %                        ode45 simulation                                 %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 q0 = param.launchAngle;
-dq0 = -8;  %Angular rate of catapult during launch
+dq0 = -4;  %Angular rate of catapult during launch
 z0Catapult = [q0;dq0];
 z0Projectile = getProjectileState(z0Catapult, param);
 
@@ -69,7 +69,7 @@ markerSize = 7;
 markerType = 'o';
 markerLine = 2;
 markerColor = [0.8,0.2,0.2];  % Red
-groundWidth = 3;
+groundWidth = 5;
 groundColor = [77,38,0]/255;
 
 %%%% horizontal position
@@ -125,8 +125,8 @@ yAll = [y,yGround];  %Collect all y points, used for scaling only
 yBnd =  [min(yAll), max(yAll)] + 0.1*[-1,1]*range(yAll);
 
 % Plot some pine trees for fun
-xTree = [0.8, 1.9, 2.6, 3.8, 8.2];
-hTree = [0.8, 1.3, 1.0, 0.7, 1.2];
+xTree = [0.8, 1.9, 2.8, 4.2, 8.2];
+hTree = 1.5*[0.8, 1.3, 1.0, 0.7, 1.2];
 for i=1:length(xTree)
     drawPineTree(xTree(i),groundModel(xTree(i)), hTree(i));
 end

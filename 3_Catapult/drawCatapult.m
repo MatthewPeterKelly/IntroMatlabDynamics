@@ -51,24 +51,27 @@ xS2 = 1.2*xSweep(end) -0.2*x0;
 yS2 = 1.2*ySweep(end) -0.2*y0;
 
 % Position where the catapult support hits the ground:
-xG = x0;
-yG = groundModel(xG);
+xG1 = x0;
+yG1 = groundModel(xG1);
+
+xG2 = xS2;
+yG2 = groundModel(xG2);
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %                     now start drawing stuff                             %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-% Supporting pole:
-plot([x0,xG],[y0,yG],'k-','LineWidth',8);
+% Support structure:
+plot([x0,xG1],[y0,yG1],'k-','LineWidth',8);
+plot([xS2,xG2],[yS2,yG2],'k-','LineWidth',8);
+plot([x0,xS2],[y0,yS2],'k-','LineWidth',6);
+plot(x0,y0,'k.','MarkerSize',40);
+plot(xS2,yS2,'k.','MarkerSize',40);
 
 % upper hard stop:
 plot([x0,xS1],[y0,yS1],'k-','LineWidth',6);
 plot(xS1,yS1,'k.','MarkerSize',40);
-
-% lower hard stop:
-plot([x0,xS2],[y0,yS2],'k-','LineWidth',6);
-plot(xS2,yS2,'k.','MarkerSize',40);
 
 % path swept by the arm:
 plot(xSweep,ySweep,'k--','LineWidth',1);
@@ -76,9 +79,6 @@ plot(xSweep,ySweep,'k--','LineWidth',1);
 % plot the arm itself:
 plot([x0,xP],[y0,yP],'LineWidth',3,'Color',0.4*[1,1,1]);
 plot(xP,yP,'ko','LineWidth',5,'MarkerSize',15,'Color',[0.2,0.2,0.8]);
-
-% plot the axle
-plot(x0,y0,'k.','MarkerSize',40);
 
 end
 

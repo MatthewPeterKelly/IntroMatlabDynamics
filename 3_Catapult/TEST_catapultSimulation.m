@@ -6,16 +6,17 @@
 %
 
 %%%% parameters for the model and simulation:
-param.armMass = 8;   %(kg)  arm is a slendar rod
-param.projectileMass = 1;  %(kg)
-param.armLength = 1.5;  %(m) 
+param.armMass = 10;   %(kg)  arm is a slendar rod
+param.projectileMass = 2;  %(kg)
+param.armLength = 2.5;  %(m) 
 param.gravity = 9.81;  %(m/s^2)
-param.springConstant = 1000;  %(N/rad)
+param.springConstant = 3000;  %(N/rad)
 param.springRestAngle = 0*(pi/180);  % (rad)  measured from pos. vert. axis.
 param.initialAngle = (90+30)*(pi/180);  % (rad)  measured from pos. vert. axis.
 param.quadraticAirDrag = 0.1;  %(N-s^2/m^2)
 param.launchAngle = 45*(pi/180);   %(rad) measured from pos. vert. axis.
-
+param.xCatapult = 0;  %(m)  horizontal position of catapult axle
+param.yCatapult = 2;  %(m)  height of the catapult axle above ground
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %                        ode45 simulation                                 %
