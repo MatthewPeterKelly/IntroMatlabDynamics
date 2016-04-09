@@ -15,19 +15,24 @@ param.springRestAngle = 0*(pi/180);  % (rad)  measured from pos. vert. axis.
 param.initialAngle = (90+30)*(pi/180);  % (rad)  measured from pos. vert. axis.
 param.quadraticAirDrag = 0.1;  %(N-s^2/m^2)
 param.launchAngle = 45*(pi/180);   %(rad) measured from pos. vert. axis.
-
+param.xCatapult = 0;  %(m)  horizontal position of catapult axle
+param.yCatapult = 2;  %(m)  height of the catapult axle above ground
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %                        ode45 simulation                                 %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-z0 = [0;3;6;5];  % [x;y;dx;dy]  initial projectile state
+q0 = param.launchAngle;
+dq0 = -8;  %Angular rate of catapult during launch
+z0Catapult = [q0;dq0];
+z0Projectile = getProjectileState(z0Catapult, param);
+
 tSpan = [0,4];  
 dynFun = @(t,z)( projectileDynamics(z,param) );
 odeOpt = odeset(...
     'Event',@(t,z)( groundEvent(z) ),...
     'AbsTol',1e-8,...
     'RelTol',1e-8);
-sol = ode45(dynFun,tSpan,z0,odeOpt);
+sol = ode45(dynFun,tSpan,z0Projectile,odeOpt);
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
@@ -37,7 +42,7 @@ sol = ode45(dynFun,tSpan,z0,odeOpt);
 %%%% Check to make sure that the catapult launched
 zEvent = sol.ye;   % state of the system at the instant of launch
 if isempty(zEvent)
-    error('No launch event detected. Invalid parameter set.');    
+    error('No ground event detected. Invalid parameter set.');    
 end
 
 %%%% Extract the grid points that ode45 actually used:
@@ -105,23 +110,42 @@ xlabel('time (s)')
 ylabel('rate (rad/s)')
 legend('arm rate','ode45 grid')
 
-%%%% Draw a picture of the whole thing on a new figure:
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+%                         draw a picuture!                                %
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 figure(3); clf; hold on;
 
-xBnd = [min(x), max(x)] + 0.1*[-1,1]*range(x);
+% Get the scaling for the graphics
+xBnd = [min(x), max(x)] + 0.2*[-1,1]*range(x);
 xGround = linspace(xBnd(1), xBnd(2), 150);
 yGround = groundModel(xGround);
 yAll = [y,yGround];  %Collect all y points, used for scaling only
 yBnd =  [min(yAll), max(yAll)] + 0.1*[-1,1]*range(yAll);
 
+% Plot some pine trees for fun
+xTree = [0.8, 1.9, 2.6, 3.8, 8.2];
+hTree = [0.8, 1.3, 1.0, 0.7, 1.2];
+for i=1:length(xTree)
+    drawPineTree(xTree(i),groundModel(xTree(i)), hTree(i));
+end
 
-plot(xGround, yGround, 'LineWidth',groundWidth,'Color',groundColor); 
-plot(x,y,'LineWidth',lineWidth,'Color',lineColor);  
-plot(xGrid,yGrid,markerType,...
+% Draw the catapult
+drawCatapult(z0Catapult,param)
+
+% Plot curves
+hGnd = plot(xGround, yGround,...
+    'LineWidth',groundWidth,'Color',groundColor); 
+hTraj = plot(x,y,...
+    'LineWidth',lineWidth,'Color',lineColor);  
+hGrid = plot(xGrid,yGrid,markerType,...
     'MarkerSize',markerSize, 'LineWidth',markerLine,'Color', markerColor);
+
+% Scale and label the axis
 set(gca,'XLim',xBnd);
 set(gca,'YLim',yBnd);
-legend('ground','trajectory','ode45 grid');
+legend([hGnd;hTraj;hGrid],{'ground';'trajectory';'ode45 grid'});
 axis equal
 xlabel('horizontal position (m)')
 ylabel('vertical position (m)')
