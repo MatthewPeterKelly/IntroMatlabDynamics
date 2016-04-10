@@ -1,4 +1,4 @@
-% TEST  --  Catapult Simulation
+% TEST  --  Catapult Launch Simulation
 %
 % Simulated a simple torsion catapult launching a projectile. 
 %

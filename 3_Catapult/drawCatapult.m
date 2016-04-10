@@ -1,8 +1,9 @@
-function drawCatapult(zCatapult,param)
-% drawCatapult(zCatapult,param)
+function [hArm, hTip] = drawCatapult(q,dq,param)
+% drawCatapult(q,dq,param)
 %
 % INPUTS:
-%   z = [q; dq] = state
+%   q = catapult arm angle
+%   dq = catapult arm rate
 %   param = struct of parameters
 %       .armMass
 %       .projectileMass
@@ -31,7 +32,7 @@ x0 = param.xCatapult;
 y0 = param.yCatapult;
 
 % Position of the tip of the arm
-zProjectile = getProjectileState(zCatapult, param);
+zProjectile = getProjectileState([q;dq], param);
 xP = zProjectile(1);
 yP = zProjectile(2);
  
@@ -77,8 +78,8 @@ plot(xS1,yS1,'k.','MarkerSize',40);
 plot(xSweep,ySweep,'k--','LineWidth',1);
 
 % plot the arm itself:
-plot([x0,xP],[y0,yP],'LineWidth',3,'Color',0.4*[1,1,1]);
-plot(xP,yP,'ko','LineWidth',5,'MarkerSize',15,'Color',[0.2,0.2,0.8]);
+hArm = plot([x0,xP],[y0,yP],'LineWidth',3,'Color',0.4*[1,1,1]);
+hTip = plot(xP,yP,'ko','LineWidth',5,'MarkerSize',15,'Color',[0.2,0.2,0.8]);
 
 end
 

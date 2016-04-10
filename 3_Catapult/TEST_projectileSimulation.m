@@ -132,7 +132,7 @@ for i=1:length(xTree)
 end
 
 % Draw the catapult
-drawCatapult(z0Catapult,param)
+drawCatapult(z0Catapult(1),z0Catapult(2),param);
 
 % Plot curves
 hGnd = plot(xGround, yGround,...
